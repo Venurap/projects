@@ -1,0 +1,892 @@
+sample Hub command - 
+spark-submit --master yarn --deploy-mode cluster --conf spark.dynamicAllocation.enabled=false --py-files src.zip --files "src/driver.py,conf/claim/claim_dev.yaml,conf/claim/hub_claim_repair_motor.dic" --driver-memory 2g --num-executors 2 --executor-memory 4g --executor-cores 2 src/driver.py --conf_file claim_dev.yaml --type_of_load hub_claim_repair_motor --env 'DEV'
+
+staging -> lake -> hub -> mart
+
+sample Hub command - 
+spark-submit 
+	--master yarn 
+	--deploy-mode cluster 
+	--conf spark.dynamicAllocation.enabled=false 
+	--py-files src.zip 
+	--files "src/driver.py,conf/claim/claim_dev.yaml,conf/claim/hub_claim_repair_motor.dic" 
+	--driver-memory 2g 
+	--num-executors 2 
+	--executor-memory 4g 
+	--executor-cores 2 src/driver.py 
+	--conf_file claim_dev.yaml 
+	--type_of_load hub_claim_repair_motor 
+	--env 'DEV'
+
+
+DEV
+https://aalhauap2g01.corp.aal.au:8889/hue/editor?editor=341880
+
+pw for sys_hdp_gi_dev - Bbo@A910
+
+
+PROD
+https://aalhapap2u01.corp.aal.au:8889/hue/accounts/login?next=/
+
+sys_hdp_gi_prod
+DP9uC*mQ
+
+
+strings = spark.read.text("/user/ivzp/4300-0.txt")
+filtered = strings.filter(strings.value.contains("James Joyce"))
+filtered.count()
+
+Narrow and Wide Transformations
+As noted, transformations are operations that Spark evaluates lazily. A huge advantage
+of the lazy evaluation scheme is that Spark can inspect your computational query
+and ascertain how it can optimize it. This optimization can be done by either joining
+or pipelining some operations and assigning them to a stage, or breaking them into
+stages by determining which operations require a shuffle or exchange of data across
+clusters.
+
+Transformations can be classified as having either narrow dependencies or wide
+dependencies.
+	Any transformation where a single output partition can be computed
+	from a single input partition is a narrow transformation
+	
+For example, in the previous
+code snippet, filter() and contains() represent narrow transformations because
+they can operate on a single partition and produce the resulting output partition
+without any exchange of data.
+
+However, groupBy() or orderBy() instruct Spark to perform wide transformations,
+where data from other partitions is read in, combined, and written to disk.
+
+Since each partition will have its own count of the word that contains the “Spark” word in its row
+of data, a count (groupBy()) will force a shuffle of data from each of the executor’s
+partitions across the cluster. In this transformation, orderBy() requires output from
+other partitions to compute the final aggregation.
+
+https://data-flair.training/blogs/pyspark-tutorial/
+
+Standalone Programs
+By creating a SparkContext in our script and by running the script using bin/pyspark, we can use PySpark from standalone Python scripts.
+
+"""SimpleApp1.py"""
+from pyspark import SparkContext
+logFile = "/user/ivzp/4300-0.txt"  # Should be some file on your system
+sc = SparkContext("local", "Simple App1")
+logData = sc.textFile(logFile).cache()
+numAs = logData.filter(lambda s: 'a' in s).count()
+numBs = logData.filter(lambda s: 'b' in s).count()
+print "Lines with a: %i, lines with b: %i" % (numAs, numBs)
+
+
+cd /opt/app/sand_box
+
+zip -r src.zip src
+
+spark-submit --master yarn --deploy-mode cluster --conf spark.dynamicAllocation.enabled=false --py-files src.zip --files "src/driver2.py" --driver-memory 4g --num-executors 3 --executor-memory 15g --executor-cores 3 src/driver2.py
+
+<<< Learning Point:Function calls=========================================================================================================================================
+EX1:-
+Functions are first class objects in Python and so you can dispatch using a dictionary. For example, if foo and bar are functions, and dispatcher is a dictionary like so.
+===========================================================================================================================================================================
+
+dispatcher = {'foo': foo, 'bar': bar}
+Note that the values are foo and bar which are the function objects, and NOT foo() and bar().
+To call foo, you can just do dispatcher['foo']()
+
+EDIT: If you want to run multiple functions stored in a list, you can possibly do something like this.
+
+dispatcher = {'foobar': [foo, bar], 'bazcat': [baz, cat]}
+
+def fire_all(func_list):
+    for f in func_list:
+        f()
+
+fire_all(dispatcher['foobar'])
+
+EX2:-
+
+Dispatching Using a Dictionary
+
+Problem
+You need to execute appropriate pieces of code in correspondence with the value of some control variable—the kind of problem that in some other languages you might approach with a case, switch, or select statement.
+
+Solution
+Object-oriented programming, thanks to its elegant concept of dispatching, does away with many (but not all) such needs. But dictionaries, and the fact that in Python functions are first-class values (in particular, they can be values in a dictionary), conspire to make the problem quite easy to solve:
+
+https://www.oreilly.com/library/view/python-cookbook/0596001673/ch01s07.html
+
+animals = []
+number_of_felines = 0
+
+def deal_with_a_cat(  ):
+    global number_of_felines
+    print "meow"
+    animals.append('feline')
+    number_of_felines += 1
+
+def deal_with_a_dog(  ):
+    print "bark"
+    animals.append('canine')
+
+def deal_with_a_bear(  ):
+    print "watch out for the *HUG*!"
+    animals.append('ursine')
+
+tokenDict = {
+    "cat": deal_with_a_cat,
+    "dog": deal_with_a_dog,
+    "bear": deal_with_a_bear,
+    }
+
+# Simulate, say, some words read from a file
+words = ["cat", "bear", "cat", "dog"]
+
+for word in words:
+    # Look up the function to call for each word, then call it
+    functionToCall = tokenDict[word]
+    functionToCall(  )
+    # You could also do it in one step, tokenDict[word](  )
+	
+===========================================================================================================================================================================end>>>
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("square", help="display a square of a given number")
+args = parser.parse_args()
+print(args.square**2)
+
+
+That didn’t go so well. That’s because argparse treats the options we give it as strings, unless we tell it otherwise. So, let’s tell argparse to treat that input as an integer:
+Chnage to below:-
+
+parser.add_argument("square", help="display a square of a given number",
+                    type=int)
+===========================================================================================================================================================================end>>>
+
+YAML Tutorial Quick Start: A Simple File
+Let's take a look at a YAML file for a brief overview.
+
+---
+ doe: "a deer, a female deer"
+ ray: "a drop of golden sun"
+ pi: 3.14159
+ xmas: true
+ french-hens: 3
+ calling-birds:
+   - huey
+   - dewey
+   - louie
+   - fred
+ xmas-fifth-day:
+   calling-birds: four
+   french-hens: 3
+   golden-rings: 5
+   partridges:
+     count: 1
+     location: "a pear tree"
+   turtle-doves: two
+   
+ The file starts with three dashes. These dashes indicate the start of a new YAML document. 
+ YAML supports multiple documents, and compliant parsers will recognize each set of dashes as the beginning of a new one. 
+ Next, we see the construct that makes up most of a typical YAML document: a key-value pair.
+ 
+ Doe is a key that points to a string value: a deer, a female deer. YAML supports more than just string values. 
+ The file starts with six key-value pairs.
+
+ 
+	
+YAML Datatypes
+Values in YAML's key-value pairs are scalar. They act like the scalar types in languages like Perl, Javascript, and Python. 
+It's usually good enough to enclose strings in quotes, leave numbers unquoted, and let the parser figure it out. 
+But that's only the tip of the iceberg. YAML is capable of a great deal more.
+
+Key-Value Pairs and Dictionaries
+The key-value is YAML's basic building block. Every item in a YAML document is a member of at least one dictionary. 
+The key is always a string. The value is a scalar so that it can be any datatype.
+ So, as we've already seen, the value can be a string, a number, or another dictionary.
+ 
+Numeric types
+YAML recognizes numeric types. We saw floating point and integers above. 
+YAML supports several other numeric types. An integer can be decimal, hexidecimal, or octal.
+
+Conclusion
+YAML is a powerful language that can be used for configuration files, messages between applications,
+ and saving application state. We covered its most commonly used features, including how to use 
+ the built-in datatypes and structure complex documents. Some platforms support YAML's advanced features, 
+ including custom datatypes.
+
+===========================================================================================================================================================================end>>>
+
+python /opt/app/sand_box/ivzp/projects/general_insurance/common_hub/src/ivzp/yaml_tst2.py
+
+python /opt/app/sand_box/ivzp/projects/general_insurance/common_hub/src/driver3.py --conf_file conf/claim/claim_devtst.yaml --type_of_load hub_claim_repair_mottst --env 'DEV'
+
+spark-submit --master yarn --deploy-mode cluster --conf spark.dynamicAllocation.enabled=false --py-files src.zip --files "src/driver4.py,conf/claim/claim_devtst.yaml,conf/claim/hub_claim_repair_mottst.dic" --driver-memory 2g --num-executors 2 --executor-memory 4g --executor-cores 2 src/driver4.py --conf_file claim_devtst.yaml --type_of_load hub_claim_repair_mottst --env 'DEV'
+
+HUB_CLAIM_REPAIR_MOTTST
+yarn logs -applicationId application_1629854654177_3119
+
+https://aalhauap2n01.corp.aal.au:8090/proxy/application_1629854654177_3117/
+
+SPARK SERVER:
+https://aalhauap2n01.corp.aal.au:18488/
+
+
+===========================================================================================================================================================================end>>>
+
+Writing JSON to a File
+The easiest way to write your data in the JSON format to a file using Python is to use store your data in a dict object, 
+which can contain other nested dicts, arrays, booleans, or other primitive types like integers and strings. 
+You can find a more detailed list of data types supported here.
+
+The built-in json package has the magic code that transforms your Python dict object in to the serialized JSON string.
+
+JSON formatter:
+
+https://jsonformatter.curiousconcept.com/
+
+ 
+import json
+
+data = {}
+data['people'] = []
+data['people'].append({
+    'name': 'Scott',
+    'website': 'stackabuse.com',
+    'from': 'Nebraska'
+})
+data['people'].append({
+    'name': 'Larry',
+    'website': 'google.com',
+    'from': 'Michigan'
+})
+data['people'].append({
+    'name': 'Tim',
+    'website': 'apple.com',
+    'from': 'Alabama'
+})
+
+with open('data/data.txt', 'w') as outfile:
+    json.dump(data, outfile)
+
+with open('data/data_indented.txt', 'w') as outfile:
+    json.dump(data, outfile, indent=4)
+
+with open('data/data_sorted.txt', 'w') as outfile:
+    json.dump(data, outfile,sort_keys = True, indent=4)
+
+with open('data.txt', 'w') as outfile:
+    json.dump(data, outfile)
+
+
+python /opt/app/sand_box/ivzp/projects/general_insurance/common_hub/src/ivzp/json_tst1.py
+
+After importing the json library, we construct some simple data to write to our file. The
+important part comes at the end when we use the with statement to open our destination file,
+then use json.dump to write the data object to the outfile file.
+
+In this article we introduced you to the json.dump, json.dumps, json.load, and json.loads methods, which help in serializing and deserializing JSON strings.
+
+With JSON having become one of the most popular ways to serialize structured data, you'll likely have to interact with it pretty frequently, 
+especially when working on web applications. Python's json module is a great way to get started,
+
+
+===========================================================================================================================================================================end>>>
+Difference between List and Dictionary in Python
+
+Lists are just like the arrays, declared in other languages. Lists need not be homogeneous always which makes it a most powerful tool in Python. 
+A single list may contain DataTypes like Integers, Strings, as well as Objects. Lists are mutable, and hence, they can be altered even after their creation.
+
+
+# Python program to demonstrate
+# Lists
+ 
+ 
+# Creating a List with
+# the use of multiple values
+List = ["Geeks", "For", "Geeks"]
+print("List containing multiple values: ")
+print(List[0]) 
+print(List[2])
+   
+# Creating a Multi-Dimensional List
+# (By Nesting a list inside a List)
+List = [['Geeks', 'For'] , ['Geeks']]
+print("\nMulti-Dimensional List: ")
+print(List)
+
+Dictionary in Python on the other hand is an unordered collection of data values, used to store data values like a map, 
+which unlike other Data Types that hold only single value as an element, Dictionary holds key:value pair. Key-value is provided in
+the dictionary to make it more optimized. Each key-value pair in a Dictionary is separated by a colon :, whereas each key is separated by a ‘comma’.
+
+# Python program to demonstrate
+# dictionary
+ 
+ 
+# Creating a Dictionary 
+# with Integer Keys
+Dict = {1: 'Geeks', 2: 'For', 3: 'Geeks'}
+print("Dictionary with the use of Integer Keys: ")
+print(Dict)
+   
+# Creating a Dictionary 
+# with Mixed keys
+Dict = {'Name': 'Geeks', 1: [1, 2, 3, 4]}
+print("\nDictionary with the use of Mixed Keys: ")
+print(Dict)
+ 
+ 
+List																			Dictionary
+List is a collection of index values pairs as that of array in c++.				Dictionary is a hashed structure of key and value pairs.
+List is created by placing elements in [ ] separated by commas “, “				Dictionary is created by placing elements in { } as “key”:”value”, each key value pair is separated by commas “, “
+The indices of list are integers starting from 0.								The keys of dictionary can be of any data type.
+The elements are accessed via indices.											The elements are accessed via key-values.
+The order of the elements entered are maintained.								There is no guarantee for maintaining order.
+
+Space-Time Trade-Off
+It is more efficient to use a dictionary for lookup of elements because it takes less time to traverse in the dictionary than a list.
+For example, let’s consider a data set with 5000000 elements in a machine learning model that relies on the speed of retrieval of data.
+ To implement this we have to choose wisely between two data structure i.e. list and dictionary.
+ The dictionary is preferred because of less time and less space storage as dictionaries are implemented 
+ in the form of hash tables from python3.6 so it is never a space-time trade-off problem in dictionaries.
+
+
+https://medium.com/analytics-vidhya/python-list-vs-tuple-vs-dictionary-4a48655c7934
+
+Difference between lists and tuples
+List has mutable nature i.e., list can be changed or modified after its creation according to needs whereas tuple has immutable nature i.e., tuple can’t be changed or modified after its creation.
+list_num = [1,2,3,4]
+tup_num = (1,2,3,4)
+print(list_num)
+print(tup_num)
+Output:
+[1,2,3,4]
+(1,2,3,4)
+list_num[2] = 5
+print(list_num)
+tup_num[2] = 5
+Output:
+[1,2,5,4]
+Traceback (most recent call last):
+File "python", line 6, in <module>
+TypeError: 'tuple' object does not support item assignment
+Also, you can’t use a list as a key for a dictionary. This is because only immutable values can be hashed. Hence, 
+we can only set immutable values like tuples as keys. But if you still want to use a list as a key, you must turn it into a tuple first.
+ Because some tuples can be used as dictionary keys (specifically, tuples that contain immutable values like strings, numbers, and other tuples).
+ Lists can never be used as dictionary keys, because lists are not immutable.
+ 
+ 
+A very fine explanation of Tuples vs List is given in the StackOverflow ans
+Apart from tuples being immutable there is also a semantic distinction that should guide their usage. Tuples are heterogeneous 
+data structures (i.e., their entries have different meanings), while lists are homogeneous sequences. Tuples have structure, lists have order.
+
+One example would be pairs of page and line number to reference locations in a book, e.g.:
+
+
+my_location = (42, 11)  # page number, line number
+
+You can then use this as a key in a dictionary to store notes on locations. A list on the other hand could be used to store multiple locations. 
+Naturally one might want to add or remove locations from the list, so it makes sense that lists are mutable.
+ On the other hand it doesn't make sense to add or remove items from an existing location - hence tuples are immutable.
+ 
+Among Tuples and List — when to use which
+
+Use a tuple when you know what information goes in the container that it is. 
+For example, when you want to store a person’s credentials for your website.
+
+person=(‘ABC’,’admin’,’12345')
+
+But when you want to store similar elements, like in an array in C++, you should use a list.
+groceries=[‘bread’,’butter’,’cheese’]
+
+https://medium.com/analytics-vidhya/python-list-vs-tuple-vs-dictionary-4a48655c7934
+
+
+===========================================================================================================================================================================end>>>
+spark-submit stand alone:-
+
+zip -r src.zip src
+
+spark-submit --master yarn --deploy-mode cluster --conf spark.dynamicAllocation.enabled=false --py-files src.zip --files "src/ivzp/lit_tst1.py" --driver-memory 2g --num-executors 2 --executor-memory 4g --executor-cores 2 src/ivzp/lit_tst1.py
+
+
+python /opt/app/sand_box/ivzp/projects/general_insurance/common_hub/src/ivzp/lambada_tst1.py
+
+spark-submit --master yarn --deploy-mode cluster --conf spark.dynamicAllocation.enabled=false --py-files src.zip --files "src/ivzp/withColumn_tst1.py" --driver-memory 2g --num-executors 2 --executor-memory 4g --executor-cores 2 src/ivzp/withColumn_tst1.py
+
+yarn logs -applicationId application_1629854654177_4672
+
+===========================================================================================================================================================================end>>>
+
+The "==" is using the equals methods which checks if the two references point to the same object. The definition of "===" depends on the context/object. For Spark , "===" is using the equalTo method. See
+
+for == https://spark.apache.org/docs/2.0.0/api/java/org/apache/spark/sql/Column.html#equals(java.lang.Object)
+for === https://spark.apache.org/docs/2.0.0/api/java/org/apache/spark/sql/Column.html#equalTo(java.lang.Object)
+(Since you are referencing Spark:) An important difference for Spark is the return value. For Column:
+
+== returns a boolean
+
+=== returns a column (which contains the result of the comparisons of the elements of two columns)
+
+ 
+Equality test.
+   // Scala:
+   df.filter( df("colA") === df("colB") )
+
+   // Java
+   import static org.apache.spark.sql.functions.*;
+   df.filter( col("colA").equalTo(col("colB")) );
+ 
+ 
+ 
+notEqual
+public Column notEqual(Object other)
+Inequality test.
+
+   // Scala:
+   df.select( df("colA") !== df("colB") )
+   df.select( !(df("colA") === df("colB")) )
+
+   // Java:
+   import static org.apache.spark.sql.functions.*;
+   df.filter( col("colA").notEqual(col("colB")) );
+ 
+https://spark.apache.org/docs/2.0.0/api/java/org/apache/spark/sql/Column.html#equalTo(java.lang.Object)
+
+public class Column
+extends Object
+A column that will be computed based on the data in a DataFrame.
+A new column is constructed based on the input columns present in a dataframe:
+
+
+   df("columnName")            // On a specific DataFrame.
+   col("columnName")           // A generic column no yet associated with a DataFrame.
+   col("columnName.field")     // Extracting a struct field
+   col("`a.column.with.dots`") // Escape `.` in column names.
+   $"columnName"               // Scala short hand for a named column.
+   expr("a + 1")               // A column that is constructed from a parsed SQL Expression.
+   lit("abc")                  // A column that produces a literal (constant) value.
+ 
+Column objects can be composed to form complex expressions:
+
+
+   $"a" + 1
+   $"a" === $"b"
+
+
+The "==" is using the equals methods which checks if the two references point to the same object. The definition of "===" depends on the context/object. For Spark , "===" is using the equalTo method
+
+Let's pick a fragment of Spark-Scala code:
+
+ dataFrame.filter($"age" === 21)
+
+There are a few things going on here:
+
+The $"age" creates a Spark Column object referencing the column named age within in a dataframe. The $ operator is defined in an implicit class StringToColumn. 
+Implicit classes are a similar concept to C# extension methods or mixins in other dynamic languages. The $ operator is like a method added on to the StringContext class.
+
+The triple equals operator === is normally the Scala type-safe equals operator, analogous to the one in Javascript. Spark overrides this with 
+a method in Column to create a new Column object that compares the Column to the left with the object on the right, returning a boolean. 
+The double-equals operator(==) cannot be overridden, therefore Spark must use the triple equals.
+
+The dataFrame.filter method takes an argument of Column, which defines the comparison to apply to the rows in the DataFrame. 
+Only rows that match the condition will be included in the resulting DataFrame.
+
+Referencing Spark: An important difference between “==” and “===” of Spark can be determined by the return value. For Column:
+
+== returns a boolean
+
+
+=== returns a column (which contains the result of the comparisons of the elements of two columns)
+
+===========================================================================================================================================================================end>>>
+
+Let's pick apart a simple fragment of Spark-Scala code: dataFrame.filter($"age" === 21).
+
+There are a few things going on here:
+
+The $"age" creates a Spark Column object referencing the column named age within in a dataframe. The $ operator is defined in an implicit class StringToColumn. 
+Implicit classes are a similar concept to C# extension methods or mixins in other dynamic languages. The $ operator is like a method added on to the StringContext class.
+
+The triple equals operator === is normally the Scala type-safe equals operator, analogous to the one in Javascript. Spark overrides this
+ with a method in Column to create a new Column object that compares the Column to the left with the object on the right, returning a boolean. 
+ Because double-equals (==) cannot be overridden, Spark must use the triple equals.
+
+The dataFrame.filter method takes an argument of Column, which defines the comparison to apply to the rows in the DataFrame. Only rows 
+that match the condition will be included in the resulting DataFrame.
+
+Note that the actual comparison is not performed when the above line of code executes! Spark methods like filter and select -- including 
+the Column objects passed in--are lazy. You can think of a DataFrame like a query builder pattern, where each call builds up a plan for 
+what Spark will do later when a call like show or write is called. It's similar in concept to something like IQueryable in LINQ, where 
+foo.Where(row => row.Age == 21) builds up a plan and an expression tree that is later translated to SQL when rows must be fetched, 
+e.g., when ToList() is called.
+
+===========================================================================================================================================================================end>>>
+
+https://github.com/palantir/pyspark-style-guide
+
+https://spark.apache.org/docs/2.0.0/api/java/org/apache/spark/sql/Column.html#substr(org.apache.spark.sql.Column,%20org.apache.spark.sql.Column)
+
+when(Column condition, Object value)
+Evaluates a list of conditions and returns one of multiple possible result expressions.
+
+PySpark supports a way to check multiple conditions in sequence and returns a value 
+when the first condition met by using SQL like case when and when().otherwise() expressions,
+these works similar to “Switch" and "if then else" statements.
+
+
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName('SparkByExamples.com').getOrCreate()
+data = [("James","M",60000),("Michael","M",70000),
+        ("Robert",None,400000),("Maria","F",500000),
+        ("Jen","",None)]
+
+columns = ["name","gender","salary"]
+df = spark.createDataFrame(data = data, schema = columns)
+df.show()
++-------+------+------+
+|   name|gender|salary|
++-------+------+------+
+|  James|     M| 60000|
+|Michael|     M| 70000|
+| Robert|  null|400000|
+|  Maria|     F|500000|
+|    Jen|      |  null|
++-------+------+------+
+
+The below code snippet replaces the value of gender with a new derived value, when conditions 
+not matched, we are assigning “Unknown” as value, for null assigning empty.
+
+
+from pyspark.sql.functions import when
+df2 = df.withColumn("new_gender", when(df.gender == "M","Male")
+                                 .when(df.gender == "F","Female")
+                                 .when(df.gender.isNull() ,"")
+                                 .otherwise(df.gender))
+df2.show()
++-------+------+------+----------+
+|   name|gender|salary|new_gender|
++-------+------+------+----------+
+|  James|     M| 60000|      Male|
+|Michael|     M| 70000|      Male|
+| Robert|  null|400000|          |
+|  Maria|     F|500000|    Female|
+|    Jen|      |  null|          |
++-------+------+------+----------+
+
+from pyspark.sql.functions import when
+df2 = df.withColumn("new_gender", when(df.gender == "M","Male")
+                                 .when(df.gender == "F","Female")
+                                 .when(df.gender.isNull() ,"")
+                                 .otherwise(df.gender))
+df2.show()
++-------+------+------+----------+
+|   name|gender|salary|new_gender|
++-------+------+------+----------+
+|  James|     M| 60000|      Male|
+|Michael|     M| 70000|      Male|
+| Robert|  null|400000|          |
+|  Maria|     F|500000|    Female|
+|    Jen|      |  null|          |
++-------+------+------+----------+
+Using with select()
+
+
+df2=df.select(col("*"),when(df.gender == "M","Male")
+                  .when(df.gender == "F","Female")
+                  .when(df.gender.isNull() ,"")
+                  .otherwise(df.gender).alias("new_gender"))
+
+===========================================================================================================================================================================end>>>
+
+https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.sql.DataFrame.dropDuplicates.html
+ 
+
+pyspark.sql.DataFrame.dropDuplicates
+DataFrame.dropDuplicates(subset=None)[source]
+Return a new DataFrame with duplicate rows removed, optionally only considering certain columns.
+
+For a static batch DataFrame, it just drops duplicate rows. For a streaming DataFrame, it will keep all data across triggers as intermediate state to drop duplicates rows. You can use withWatermark() to limit how late the duplicate data can be and system will accordingly limit the state. In addition, too late data older than watermark will be dropped to avoid any possibility of duplicates.
+
+drop_duplicates() is an alias for dropDuplicates().
+
+New in version 1.4.0.
+
+Examples
+
+>>>
+from pyspark.sql import Row
+df = sc.parallelize([ \
+    Row(name='Alice', age=5, height=80), \
+    Row(name='Alice', age=5, height=80), \
+    Row(name='Alice', age=10, height=80)]).toDF()
+df.dropDuplicates().show()
++-----+---+------+
+| name|age|height|
++-----+---+------+
+|Alice|  5|    80|
+|Alice| 10|    80|
++-----+---+------+
+>>>
+df.dropDuplicates(['name', 'height']).show()
++-----+---+------+
+| name|age|height|
++-----+---+------+
+|Alice|  5|    80|
++-----+---+------+
+===========================================================================================================================================================================end>>>
+
+PySpark Select Columns From DataFrame
+
+In PySpark, select() function is used to select single, multiple, column by index,
+ all columns from the list and the nested columns from a DataFrame, PySpark
+ select() is a transformation function hence it returns a new DataFrame with the selected columns.
+ 
+ First, let’s create a Dataframe.
+ 
+import pyspark
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName('SparkByExamples.com').getOrCreate()
+data = [("James","Smith","USA","CA"),
+		("Michael","Rose","USA","NY"),
+		("Robert","Williams","USA","CA"),
+		("Maria","Jones","USA","FL")
+	  ]
+columns = ["firstname","lastname","country","state"]
+df = spark.createDataFrame(data = data, schema = columns)
+df.show(truncate=False)
+
+1. Select Single & Multiple Columns From PySpark
+You can select the single or multiple columns of the DataFrame by passing the column names you wanted to select to the select() function.
+Since DataFrame is immutable, this creates a new DataFrame with selected columns. show() function is used to show the Dataframe contents.
+
+Below are ways to select single, multiple or all columns.
+
+df.select("firstname","lastname").show()
+df.select(df.firstname,df.lastname).show()
+df.select(df["firstname"],df["lastname"]).show()
+
+#By using col() function
+from pyspark.sql.functions import col
+df.select(col("firstname"),col("lastname")).show()
+
+#Select columns by regular expression
+df.select(df.colRegex("`^.*name*`")).show()
+
+2. Select All Columns From List
+Sometimes you may need to select all DataFrame columns from a Python list. In the below example, we have all columns in the columns list object.
+
+
+# Select All columns from List
+df.select(*columns).show()
+
+# Select All columns
+df.select([col for col in df.columns]).show()
+df.select("*").show()
+
+3. Select Columns by Index
+Using a python list features, you can select the columns by index.
+
+
+#Selects first 3 columns and top 3 rows
+df.select(df.columns[:3]).show(3)
+
+#Selects columns 2 to 4  and top 3 rows
+df.select(df.columns[2:4]).show(3)
+
+4. Select Nested Struct Columns from PySpark
+If you have a nested struct (StructType) column on PySpark DataFrame, 
+you need to use an explicit column qualifier in order to select.
+ If you are new to PySpark and you have not learned StructType yet, 
+ I would recommend skipping the rest of the section or first Understand PySpark StructType before you proceed.
+ 
+ First, let’s create a new DataFrame with a struct type.
+ 
+ data = [
+        (("James",None,"Smith"),"OH","M"),
+        (("Anna","Rose",""),"NY","F"),
+        (("Julia","","Williams"),"OH","F"),
+        (("Maria","Anne","Jones"),"NY","M"),
+        (("Jen","Mary","Brown"),"NY","M"),
+        (("Mike","Mary","Williams"),"OH","M")
+        ]
+
+from pyspark.sql.types import StructType,StructField, StringType        
+schema = StructType([
+    StructField('name', StructType([
+         StructField('firstname', StringType(), True),
+         StructField('middlename', StringType(), True),
+         StructField('lastname', StringType(), True)
+         ])),
+     StructField('state', StringType(), True),
+     StructField('gender', StringType(), True)
+     ])
+df2 = spark.createDataFrame(data = data, schema = schema)
+df2.printSchema()
+df2.show(truncate=False) # shows all columns
+
+Yields below schema output. If you notice the column name is a struct type which consists of columns firstname, middlename, lastname.
+
+
+root
+ |-- name: struct (nullable = true)
+ |    |-- firstname: string (nullable = true)
+ |    |-- middlename: string (nullable = true)
+ |    |-- lastname: string (nullable = true)
+ |-- state: string (nullable = true)
+ |-- gender: string (nullable = true)
+
++----------------------+-----+------+
+|name                  |state|gender|
++----------------------+-----+------+
+|[James,, Smith]       |OH   |M     |
+|[Anna, Rose, ]        |NY   |F     |
+|[Julia, , Williams]   |OH   |F     |
+|[Maria, Anne, Jones]  |NY   |M     |
+|[Jen, Mary, Brown]    |NY   |M     |
+|[Mike, Mary, Williams]|OH   |M     |
++----------------------+-----+------+
+
+df2.select("name").show(truncate=False)
+
+Now, let’s select struct column.
+
+
+df2.select("name").show(truncate=False)
+This returns struct column name as is.
+
+
++----------------------+
+|name                  |
++----------------------+
+|[James,, Smith]       |
+|[Anna, Rose, ]        |
+|[Julia, , Williams]   |
+|[Maria, Anne, Jones]  |
+|[Jen, Mary, Brown]    |
+|[Mike, Mary, Williams]|
++----------------------+
+
+
+In order to select the specific column from a nested struct, you need to explicitly qualify the nested struct column name.
+
+
+df2.select("name.firstname","name.lastname").show(truncate=False)
+This outputs firstname and lastname from the name struct column.
+
+
++---------+--------+
+|firstname|lastname|
++---------+--------+
+|James    |Smith   |
+|Anna     |        |
+|Julia    |Williams|
+|Maria    |Jones   |
+|Jen      |Brown   |
+|Mike     |Williams|
++---------+--------+
+In order to get all columns from struct column.
+
+df2.select("name.*").show(truncate=False)
+This yields below output.
+
+
++---------+----------+--------+
+|firstname|middlename|lastname|
++---------+----------+--------+
+|James    |null      |Smith   |
+|Anna     |Rose      |        |
+|Julia    |          |Williams|
+|Maria    |Anne      |Jones   |
+|Jen      |Mary      |Brown   |
+|Mike     |Mary      |Williams|
++---------+----------+--------+
+
+5. Complete Example
+
+import pyspark
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.appName('SparkByExamples.com').getOrCreate()
+
+data = [("James","Smith","USA","CA"),
+    ("Michael","Rose","USA","NY"),
+    ("Robert","Williams","USA","CA"),
+    ("Maria","Jones","USA","FL")
+  ]
+
+columns = ["firstname","lastname","country","state"]
+df = spark.createDataFrame(data = data, schema = columns)
+df.show(truncate=False)
+
+df.select("firstname").show()
+
+df.select("firstname","lastname").show()
+
+#Using Dataframe object name
+df.select(df.firstname,df.lastname).show()
+
+# Using col function
+from pyspark.sql.functions import col
+df.select(col("firstname"),col("lastname")).show()
+
+data = [(("James",None,"Smith"),"OH","M"),
+        (("Anna","Rose",""),"NY","F"),
+        (("Julia","","Williams"),"OH","F"),
+        (("Maria","Anne","Jones"),"NY","M"),
+        (("Jen","Mary","Brown"),"NY","M"),
+        (("Mike","Mary","Williams"),"OH","M")
+        ]
+
+from pyspark.sql.types import StructType,StructField, StringType        
+schema = StructType([
+    StructField('name', StructType([
+         StructField('firstname', StringType(), True),
+         StructField('middlename', StringType(), True),
+         StructField('lastname', StringType(), True)
+         ])),
+     StructField('state', StringType(), True),
+     StructField('gender', StringType(), True)
+     ])
+
+df2 = spark.createDataFrame(data = data, schema = schema)
+df2.printSchema()
+df2.show(truncate=False) # shows all columns
+
+df2.select("name").show(truncate=False)
+df2.select("name.firstname","name.lastname").show(truncate=False)
+df2.select("name.*").show(truncate=False)
+
+Select using Regex with column name like in pyspark (select column name like):
+colRegex() function with regular expression inside is used to select the column with regular expression. In our example we will be using the regular expressions and will be capturing the column whose name  starts with or contains “Item” in it.
+
+1
+## select using Regex with column name like
+2
+ 
+3
+df_basket1.select(df_basket1.colRegex("`(Item)+?.+`")).show()
+the above code selects columns which has the column name like Item%. so the resultant dataframe will be
+
+Item_group 	Item_name	Item_type
+Fruit		Apple		soft
+Fruit		Mango		soft
+Grain		Almond		Hard
+
+
+https://wiki.corp.aal.au/display/GICOP/GI-COP+-+hub_claim_statistics
+
+spark-submit --master yarn --deploy-mode cluster --conf spark.dynamicAllocation.enabled=false --conf spark.scheduler.mode=FAIR --conf spark.debug.maxToStringFields=1000 --conf spark.driver.memoryOverhead=2048 --num-executors 8 --driver-memory 4g --executor-memory 4g --executor-cores 5 --conf spark.hadoop.fs.permissions.umask-mode=002 --conf spark.yarn.appMasterEnv.HADOOP_USER_NAME=sys_hdp_gi_dev --py-files src.zip --files "src/driver.py,conf/claim/hub_claim_statistics.dic,conf/claim/claim_dev.yaml" driver.py --conf_file claim_dev.yaml --type_of_load hub_claim_statistics --env 'DEV'
+
+
+
+
+
+
+
+
+
+
+
+
+
